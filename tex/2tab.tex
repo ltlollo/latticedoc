@@ -1,0 +1,63 @@
+\section{Moltiplicazione modulo $\mathtt{0x20008001}$}
+Per comprendere come vettorizzare un prodotto modulo $\mathtt{0x20008001}$, e
+stimarne il costo operativo, è sufficiente osservare la seguente tabella delle
+potenze del 2, il loro valore modulo $q$, e il loro valore negato modulo $q$:\\
+\begin{table} [h]
+    \scriptsize
+    \centering
+    \begin{tabular} {|R|R|R|R|R|R|R|R|}
+        \hline
+        n  &               2^n  & 2^n mod\,q & q-2^n mod\,q & n  &               2^n  & 2^n mod\,q & q-2^n mod\,q \\ 
+        \hline
+        0  &        \mathtt{0x1}  &        \mathtt{0x1}  & \mathtt{0x20008000}  & 32 &        \mathtt{0x100000000} & \mathtt{0x1ffc7ff9}  & \mathtt{0x40008}      \\
+        1  &        \mathtt{0x2}  &        \mathtt{0x2}  & \mathtt{0x20007fff}  & 33 &        \mathtt{0x200000000} & \mathtt{0x1ff87ff1}  & \mathtt{0x80010}      \\
+        2  &        \mathtt{0x4}  &        \mathtt{0x4}  & \mathtt{0x20007ffd}  & 34 &        \mathtt{0x400000000} & \mathtt{0x1ff07fe1}  & \mathtt{0x100020}     \\
+        3  &        \mathtt{0x8}  &        \mathtt{0x8}  & \mathtt{0x20007ff9}  & 35 &        \mathtt{0x800000000} & \mathtt{0x1fe07fc1}  & \mathtt{0x200040}     \\
+        4  &       \mathtt{0x10}  &       \mathtt{0x10}  & \mathtt{0x20007ff1}  & 36 &       \mathtt{0x1000000000} & \mathtt{0x1fc07f81}  & \mathtt{0x400080}     \\
+        5  &       \mathtt{0x20}  &       \mathtt{0x20}  & \mathtt{0x20007fe1}  & 37 &       \mathtt{0x2000000000} & \mathtt{0x1f807f01}  & \mathtt{0x800100}     \\
+        6  &       \mathtt{0x40}  &       \mathtt{0x40}  & \mathtt{0x20007fc1}  & 38 &       \mathtt{0x4000000000} & \mathtt{0x1f007e01}  & \mathtt{0x1000200}    \\
+        7  &       \mathtt{0x80}  &       \mathtt{0x80}  & \mathtt{0x20007f81}  & 39 &       \mathtt{0x8000000000} & \mathtt{0x1e007c01}  & \mathtt{0x2000400}    \\
+        8  &      \mathtt{0x100}  &      \mathtt{0x100}  & \mathtt{0x20007f01}  & 40 &      \mathtt{0x10000000000} & \mathtt{0x1c007801}  & \mathtt{0x4000800}    \\
+        9  &      \mathtt{0x200}  &      \mathtt{0x200}  & \mathtt{0x20007e01}  & 41 &      \mathtt{0x20000000000} & \mathtt{0x18007001}  & \mathtt{0x8001000}    \\
+        10 &      \mathtt{0x400}  &      \mathtt{0x400}  & \mathtt{0x20007c01}  & 42 &      \mathtt{0x40000000000} & \mathtt{0x10006001}  & \mathtt{0x10002000}   \\
+        11 &      \mathtt{0x800}  &      \mathtt{0x800}  & \mathtt{0x20007801}  & 43 &      \mathtt{0x80000000000} &     \mathtt{0x4001}  & \mathtt{0x20004000}   \\
+        12 &     \mathtt{0x1000}  &     \mathtt{0x1000}  & \mathtt{0x20007001}  & 44 &     \mathtt{0x100000000000} &     \mathtt{0x8002}  & \mathtt{0x1fffffff}   \\
+        13 &     \mathtt{0x2000}  &     \mathtt{0x2000}  & \mathtt{0x20006001}  & 45 &     \mathtt{0x200000000000} &    \mathtt{0x10004}  & \mathtt{0x1fff7ffd}   \\
+        14 &     \mathtt{0x4000}  &     \mathtt{0x4000}  & \mathtt{0x20004001}  & 46 &     \mathtt{0x400000000000} &    \mathtt{0x20008}  & \mathtt{0x1ffe7ff9}   \\
+        15 &     \mathtt{0x8000}  &     \mathtt{0x8000}  & \mathtt{0x20000001}  & 47 &     \mathtt{0x800000000000} &    \mathtt{0x40010}  & \mathtt{0x1ffc7ff1}   \\
+        16 &    \mathtt{0x10000}  &    \mathtt{0x10000}  & \mathtt{0x1fff8001}  & 48 &    \mathtt{0x1000000000000} &    \mathtt{0x80020}  & \mathtt{0x1ff87fe1}   \\
+        17 &    \mathtt{0x20000}  &    \mathtt{0x20000}  & \mathtt{0x1ffe8001}  & 49 &    \mathtt{0x2000000000000} &   \mathtt{0x100040}  & \mathtt{0x1ff07fc1}   \\
+        18 &    \mathtt{0x40000}  &    \mathtt{0x40000}  & \mathtt{0x1ffc8001}  & 50 &    \mathtt{0x4000000000000} &   \mathtt{0x200080}  & \mathtt{0x1fe07f81}   \\
+        19 &    \mathtt{0x80000}  &    \mathtt{0x80000}  & \mathtt{0x1ff88001}  & 51 &    \mathtt{0x8000000000000} &   \mathtt{0x400100}  & \mathtt{0x1fc07f01}   \\
+        20 &   \mathtt{0x100000}  &   \mathtt{0x100000}  & \mathtt{0x1ff08001}  & 52 &   \mathtt{0x10000000000000} &   \mathtt{0x800200}  & \mathtt{0x1f807e01}   \\
+        21 &   \mathtt{0x200000}  &   \mathtt{0x200000}  & \mathtt{0x1fe08001}  & 53 &   \mathtt{0x20000000000000} &  \mathtt{0x1000400}  & \mathtt{0x1f007c01}   \\
+        22 &   \mathtt{0x400000}  &   \mathtt{0x400000}  & \mathtt{0x1fc08001}  & 54 &   \mathtt{0x40000000000000} &  \mathtt{0x2000800}  & \mathtt{0x1e007801}   \\
+        23 &   \mathtt{0x800000}  &   \mathtt{0x800000}  & \mathtt{0x1f808001}  & 55 &   \mathtt{0x80000000000000} &  \mathtt{0x4001000}  & \mathtt{0x1c007001}   \\
+        24 &  \mathtt{0x1000000}  &  \mathtt{0x1000000}  & \mathtt{0x1f008001}  & 56 &  \mathtt{0x100000000000000} &  \mathtt{0x8002000}  & \mathtt{0x18006001}   \\
+        25 &  \mathtt{0x2000000}  &  \mathtt{0x2000000}  & \mathtt{0x1e008001}  & 57 &  \mathtt{0x200000000000000} & \mathtt{0x10004000}  & \mathtt{0x10004001}   \\
+        26 &  \mathtt{0x4000000}  &  \mathtt{0x4000000}  & \mathtt{0x1c008001}  & 58 &  \mathtt{0x400000000000000} & \mathtt{0x20008000}  & \mathtt{0x1}          \\
+        27 &  \mathtt{0x8000000}  &  \mathtt{0x8000000}  & \mathtt{0x18008001}  & 59 &  \mathtt{0x800000000000000} & \mathtt{0x20007fff}  & \mathtt{0x2}          \\
+        28 & \mathtt{0x10000000}  & \mathtt{0x10000000}  & \mathtt{0x10008001}  & 60 & \mathtt{0x1000000000000000} & \mathtt{0x20007ffd}  & \mathtt{0x4}          \\
+        29 & \mathtt{0x20000000}  & \mathtt{0x20000000}  & \mathtt{0x8001}      & 61 & \mathtt{0x2000000000000000} & \mathtt{0x20007ff9}  & \mathtt{0x8}          \\
+        30 & \mathtt{0x40000000}  & \mathtt{0x1fff7fff}  & \mathtt{0x10002}     & 62 & \mathtt{0x4000000000000000} & \mathtt{0x20007ff1}  & \mathtt{0x10}         \\
+        31 & \mathtt{0x80000000}  & \mathtt{0x1ffe7ffd}  & \mathtt{0x20004}     & 63 & \mathtt{0x8000000000000000} & \mathtt{0x20007fe1}  & \mathtt{0x20}         \\
+        \hline
+    \end{tabular}
+\end{table}\\
+Per ogni coppia di vettore a 32bit normalizzati modulo $\mathtt{0x20008001}$ da
+moltiplicare membro a membro, se ne ricavano due coppie di due vettori a 64bit,
+che vengono moltiplicati tra di loro.\\
+Per rinormalizzare tali vettori a valori nel range $[-q + \mathtt{0xbfc3}, 2q-\mathtt{0xc004}]$ è sufficiente andare
+ad aggiungere o sottrarre il prodotto delle regioni dei bit
+$[0:28],\,[29:42],\,[43:57],\,[58:63]$ per il loro valore di molteplicità
+positiva o negativa. Essendo tali moltepilicità sempre scomponibili in somme di
+coppie di potenze del due, la generazione di multipli consiste in semplici
+operazioni di masking e due shift ciascuno.\\
+Le coppie di vettori vengono poi riportate su un solo vettore e rinormalizzate
+nel dominio $[0,q - 1]$
+\\
+Andando a considerare solo la latenza di ogni singola operazione, ed ignorando
+quindi informazioni di hardware e software pilelining, register-stack spill, e
+thruput, è possibile assegnare ad ogni prodotto modulo $\mathtt{0x20008001}$ il
+costo di 48 cycles per vettore, cioè 12 cycles in architetture che supportano
+AVX, e 6 cycles in AVX2.

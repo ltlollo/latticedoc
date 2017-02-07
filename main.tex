@@ -1,0 +1,35 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{luainputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usetikzlibrary{arrows,arrows.meta,decorations.pathmorphing,backgrounds,positioning,fit,petri}
+\usepackage[all]{xy}
+\usepackage{mathrsfs}
+\usepackage{array}
+\usepackage[none]{hyphenat}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true]{microtype}
+
+\newcolumntype{R}{>{$}r<{$}}
+\newcolumntype{L}{>{$}l<{$}}
+
+#bash
+#   echo "\title{$TITLE}"
+#   echo "\author{$AUTHOR}"
+
+##\date{Martedì, 2017, D.C.}
+
+\begin{document}
+\maketitle
+
+\section{Index}
+\subsection{Index}
+\tableofcontents
+\newpage
+
+#ls tex/*.tex | sort | sed -re's/^/\\input{..\//g;s/$/}/g'
+
+\end{document}

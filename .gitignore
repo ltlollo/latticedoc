@@ -1,0 +1,3 @@
+*.pdf
+build/main*
+build/Makefile

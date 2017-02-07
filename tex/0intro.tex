@@ -1,0 +1,21 @@
+\section{Introduzione}
+\subsection{Abstract}
+Uno dei più rencenti sviluppi della crittografia moderna sono i metodi basati
+su reticoli (Lattice), metodi che mostrano promettenti segni di applicabilità
+in diversi domini della crittografia, variando da key exchange, signing ed
+aprendone di nuovi, quali per esempio quello dell'homomorphic encryption.\\
+\\
+Tali metodi richiedono lo svolgimento di operazioni di somma e prodotto di
+polinomi di grado $N-1$ modulo $q$, dove $N$ potenza del 2, $q$ numero primo in
+$\mathbb{Z}$.\\
+\\
+Essendo tali operazioni molto complesse, ed alla base dell'elaborazione di una
+quantità di dati possibilmente molto alta, è necessario che siano implementate
+nel modo più efficente possibile.\\
+\\
+Nel seguente testo si vuole quindi descrivere l'operazione di multiplicazione
+polinomiale, facendone una stima di complessità per un'implementazione
+diretta, e descrivendone una implementazione che fa uso della NTT,
+stimandone la sua complessità, per concludere con una considerazione sulla
+implementazione vettorizzata del prodotto di polinomi in
+$(N, q) = (1024, \mathtt{0x20008001})$.\\

@@ -1,0 +1,88 @@
+\pagebreak
+\section{Esempio di applicazione}
+\subsection{ring-LWE-DH key exchange}
+Una delle applicazioni dei reticoli, e che fa perciò uso del prodotto
+polinomiale in $\mathbb{Z}_q[x]/\langle x^N+1 \rangle$ è lo scambio di chiavi
+in crittografia asimmetrica di tipo Diffie-Hellman.\\
+\\
+Tale scambio avviene seguendo il seguente schema operativo:\\
+\begin{tabular} {RL}
+    \xymatrix {
+        \mathit{Alice} \ar[d]_{(\mathbf{s}_{k}, \mathbf{e})}
+        && \mathit{Pub}
+        \ar[lld]_{\mathbf{P}_{k}}
+        \ar[rrd]^{\mathbf{P}_{k}} \ar@{.}[ddddddd]
+        && \mathit{Bob} \ar[d]^{(\mathbf{s}_{k}', \mathbf{e}')}         \\
+        \bullet \ar[d]_{\mathbf{P}_{k} \times \mathbf{s}_{k} +
+        \mathbf{e} = \mathbf{T}} 
+        &&&& \ar[dd]^{\mathbf{P}_{k} \times \mathbf{s}_{k}' +
+        \mathbf{e}' = \mathbf{T}'}
+        \bullet                                                         \\
+        \bullet \ar[rrrrd]^(0.25){\mathbf{T}} \ar[dd]
+        &&&&                                                            \\
+        &&&& \ar[d]^{(\mathbf{P}_{k}\times \mathbf{s}_{k} +
+        \mathbf{e}')
+        \times \mathbf{s}_{k}' = \mathbf{V}'}
+        \bullet \ar[lllld]_(0.25){\mathbf{T}'}                          \\
+        \bullet \ar[dd]_{\mathbf{s}_{k} \times (\mathbf{P}_{k}\times
+        \mathbf{s}_{k}' + \mathbf{e}') = \mathbf{V}}
+        &&&& \ar[d]^{\mathrm{Round}(\mathbf{V}') = (\mathbf{r},
+        \mathbf{s}_{s})}
+        \bullet                                                         \\
+        &&&& \ar[lllld]_(0.25){\mathbf{r}} \ar[dd]
+        \bullet                                                         \\
+        \bullet \ar[d]_{\mathrm{Round}(\mathbf{V},\mathbf{r}) =
+        \mathbf{s}_s}
+        &&&&                                                            \\
+        \mathbf{s}_s && \mathit{Eve} && \mathbf{s}_s                    \\
+    } &
+    \tiny
+    \begin{tabular} {|l|}
+        \hline
+        \\
+        $\mathbf{P}_k    : \text{Public key}$            \\
+        $\mathbf{s}_k    : \text{Alice's secret key}$    \\
+        $\mathbf{s}_k'   : \text{Bob's secret key}$      \\
+        $\mathbf{e}      : \text{Alice's error vector}$  \\
+        $\mathbf{e}'     : \text{Bob's error vector}$    \\
+        $\mathbf{s}_s    : \text{Shared secret}$         \\
+        $\mathbf{r}      : \text{Rounding information}$  \\
+        $\times : \text{Polynomial product}$    \\
+        $+      : \text{Polynomial sum}$        \\
+        \\
+        \hline
+    \end{tabular}
+\end{tabular}\\
+\\
+\\
+In un primo momento Alice e Bob, generano due vettori casuali in $\mathbb{Z}_q$,
+$(\mathbf{s}_k, \mathbf{s}_k',\mathbf{e},\mathbf{e}')$, distribuiti
+gaussianamente attorno a $\frac{q-1}{2}$ con $\sigma = \frac{8}{\sqrt{2\pi}}$,
+o in modo uniforme su un intorno $[-b, b]$ di $\frac{q-1}{2}$, con $b$ picclolo
+rispetto a $q$. Il primo dei vettori rappresenta la chiave privata ed il
+secondo il suo vettore degli errori associato.\\
+\pagebreak
+\\
+Successivamente, data una chiave pubblica $\mathbf{P}_k$, entrambi calcolano il
+prodotto della chiave pubblica per la privata più il suo vettore degli errori
+($\mathbf{P}_{k} \times \mathbf{s}_{k} + \mathbf{e}$), e lo inviano alla
+controparte.\\
+\\
+Ricevuto il messaggio, entrambi lo moltiplicano per la propria chiave
+privata.\\
+\\
+Bob approssima il vettore così ottenuto mappando i valori in
+$[\frac{q-1}{4},\frac{3(q-1)}{4}-1]$ a 1 e i restanti a 0. Invia inoltre ad
+Alice un vettore binario $\mathbf{r}$ ottenuto mappando i valori del vettore
+originario in $[\frac{q-1}{4},\frac{2(q-1)}{4}-1]\cup[\frac{3(q-1)}{4}+1,q-1]$
+a 1, altrimenti a 0.\\
+\\
+Utilizzando i valori di approssimazione $\mathbf{r}$ reicevuti da Bob, Alice
+mappa il vettore ottenuto dal passo precedente da
+$[\frac{q-1}{8},\frac{5(q-1)}{8}-1]$ a 1 e 0 altrimenti, se i corrispondenti
+valori in $\mathbf{r}$ sono 1, se invece sono 0 da
+$[\frac{3(q-1)}{8},\frac{7(q-1)}{8}-1]$ in 1 e 0 altrimenti.\\
+\\
+Il risultato di entrambe le operazioni di approssimazione è il vettore binario
+$\mathbf{s}_s$ di $N$bit, che verrà poi usato come segreto condiviso per
+comunicare privatamente attaverso l'uso di schemi di crittografia simmetrica.\\
